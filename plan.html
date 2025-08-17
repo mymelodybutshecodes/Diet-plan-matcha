@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Wellness Plan</title>
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f6fbf4;
+        color: #2f3e2f;
+        padding: 2rem;
+        max-width: 900px;
+        margin: auto;
+    }
+    h1, h2 {
+        color: #3b7a57;
+    }
+    .section {
+        background: #ffffff;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-radius: 14px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+        border-left: 6px solid #88c999;
+    }
+    ul {
+        margin-left: 1.2rem;
+    }
+    .highlight {
+        color: #3b7a57;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<h1 id="greeting"></h1>
+
+<div class="section" id="workout-plan">
+    <h2>7-Day Workout Plan</h2>
+    <ul id="workouts"></ul>
+</div>
+
+<div class="section" id="nutrition">
+    <h2>Nutrition & Macros</h2>
+    <p id="nutrition-text"></p>
+    <ul id="macro-breakdown"></ul>
+</div>
+
+<div class="section" id="bmi-section">
+    <h2>Your Health Stats</h2>
+    <p id="bmi-text"></p>
+</div>
+
+<div class="section" id="tips">
+    <h2>Personalized Tips</h2>
+    <ul id="tips-list"></ul>
+</div>
+
+<script>
+const name = localStorage.getItem("userName") || "Friend";
+const quiz = JSON.parse(localStorage.getItem("quizData"));
+
+document.getElementById("greeting").innerText = `Hi ${name}, here's your personalized wellness plan!`;
+
+// Workout Plan
+const workoutList = document.getElementById("workouts");
+
+const homePlan = [
+    "Day 1: Full body HIIT",
+    "Day 2: Yoga & Stretching",
+    "Day 3: Core & Abs",
+    "Day 4: Rest or light walk",
+    "Day 5: Glutes & Legs",
+    "Day 6: Upper Body",
+    "Day 7: Rest & recovery"
+];
+
+const gymPlan = [
+    "Day 1: Push (Chest/Shoulders/Triceps)",
+    "Day 2: Pull (Back/Biceps)",
+    "Day 3: Legs (Quads/Hamstrings/Glutes)",
+    "Day 4: Cardio + Core",
+    "Day 5: Push",
+    "Day 6: Pull",
+    "Day 7: Rest"
+];
+
+const chosenPlan = quiz.location === "Gym" ? gymPlan : homePlan;
+chosenPlan.forEach(day => {
+    let li = document.createElement("li");
+    li.textContent = day;
+    workoutList.appendChild(li);
+});
+
+// Nutrition Advice
+let nutritionAdvice = "";
+if (quiz.goal === "Weight Loss") {
+    nutritionAdvice = "Aim for a calorie deficit with high protein, moderate carbs, and healthy fats.";
+} else if (quiz.goal === "Muscle Gain") {
+    nutritionAdvice = "Aim for a calorie surplus with high protein, complex carbs, and healthy fats.";
+} else if (quiz.goal === "Endurance") {
+    nutritionAdvice = "Focus on complex carbs for energy, with lean protein and moderate healthy fats.";
+} else {
+    nutritionAdvice = "Maintain balanced macros: ~40% carbs, 30% protein, 30% fats.";
+}
+if (quiz.vegan) nutritionAdvice += " Ensure adequate plant-based protein sources like lentils, tofu, and quinoa.";
+if (quiz.allergies.length > 0) nutritionAdvice += ` Avoid: ${quiz.allergies.join(", ")}.`;
+
+document.getElementById("nutrition-text").innerText = nutritionAdvice;
+
+// Macro Breakdown (simple calculation)
+const weight = parseFloat(quiz.weight);
+let protein = (weight * 1.8).toFixed(0); // grams
+let fats = (weight * 0.8).toFixed(0);    // grams
+let carbs = (weight * 3).toFixed(0);     // grams
+
+document.getElementById("macro-breakdown").innerHTML = `
+    <li><span class="highlight">Protein:</span> ${protein} g/day</li>
+    <li><span class="highlight">Carbs:</span> ${carbs} g/day</li>
+    <li><span class="highlight">Fats:</span> ${fats} g/day</li>
+`;
+
+// BMI Calculation
+const heightM = quiz.height / 100;
+const bmi = (quiz.weight / (heightM * heightM)).toFixed(1);
+let bmiStatus = "";
+if (bmi < 18.5) bmiStatus = "Underweight";
+else if (bmi < 24.9) bmiStatus = "Normal weight";
+else if (bmi < 29.9) bmiStatus = "Overweight";
+else bmiStatus = "Obese";
+
+document.getElementById("bmi-text").innerText = `Your BMI is ${bmi} (${bmiStatus}).`;
+
+// Personalized Tips
+const tips = [];
+if (quiz.goal === "Weight Loss") {
+    tips.push("Stay in a calorie deficit, but avoid cutting carbs too aggressively.");
+    tips.push("Drink plenty of water and track your meals.");
+} else if (quiz.goal === "Muscle Gain") {
+    tips.push("Prioritize progressive overload in strength training.");
+    tips.push("Increase your protein intake and get enough sleep.");
+} else if (quiz.goal === "Endurance") {
+    tips.push("Carb load before long workouts for better performance.");
+    tips.push("Hydrate with electrolytes, not just water.");
+} else {
+    tips.push("Maintain a balanced diet and include a mix of strength and cardio.");
+    tips.push("Aim for 7–8 hours of quality sleep.");
+}
+
+tips.forEach(tip => {
+    let li = document.createElement("li");
+    li.textContent = tip;
+    document.getElementById("tips-list").appendChild(li);
+});
+</script>
+
+</body>
+</html>
