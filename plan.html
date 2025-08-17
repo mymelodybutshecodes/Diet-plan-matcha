@@ -110,11 +110,27 @@ if (quiz.allergies.length > 0) nutritionAdvice += ` Avoid: ${quiz.allergies.join
 
 document.getElementById("nutrition-text").innerText = nutritionAdvice;
 
-// Macro Breakdown (simple calculation)
+// --- Macro Breakdown (goal-adjusted) ---
 const weight = parseFloat(quiz.weight);
-let protein = (weight * 1.8).toFixed(0); // grams
-let fats = (weight * 0.8).toFixed(0);    // grams
-let carbs = (weight * 3).toFixed(0);     // grams
+let protein, fats, carbs;
+
+if (quiz.goal === "Weight Loss") {
+    protein = (weight * 2.0).toFixed(0);   // higher protein
+    fats = (weight * 0.7).toFixed(0);      // lower fats
+    carbs = (weight * 2.0).toFixed(0);     // reduced carbs
+} else if (quiz.goal === "Muscle Gain") {
+    protein = (weight * 2.2).toFixed(0);   // highest protein
+    fats = (weight * 1.0).toFixed(0);      // moderate fats
+    carbs = (weight * 3.5).toFixed(0);     // high carbs
+} else if (quiz.goal === "Endurance") {
+    protein = (weight * 1.6).toFixed(0);   // moderate protein
+    fats = (weight * 0.8).toFixed(0);      // moderate fats
+    carbs = (weight * 4.0).toFixed(0);     // highest carbs
+} else {
+    protein = (weight * 1.8).toFixed(0);   // balanced
+    fats = (weight * 0.9).toFixed(0);
+    carbs = (weight * 3.0).toFixed(0);
+}
 
 document.getElementById("macro-breakdown").innerHTML = `
     <li><span class="highlight">Protein:</span> ${protein} g/day</li>
@@ -122,7 +138,7 @@ document.getElementById("macro-breakdown").innerHTML = `
     <li><span class="highlight">Fats:</span> ${fats} g/day</li>
 `;
 
-// BMI Calculation
+// --- BMI Calculation ---
 const heightM = quiz.height / 100;
 const bmi = (quiz.weight / (heightM * heightM)).toFixed(1);
 let bmiStatus = "";
@@ -133,7 +149,7 @@ else bmiStatus = "Obese";
 
 document.getElementById("bmi-text").innerText = `Your BMI is ${bmi} (${bmiStatus}).`;
 
-// Personalized Tips
+// --- Personalized Tips ---
 const tips = [];
 if (quiz.goal === "Weight Loss") {
     tips.push("Stay in a calorie deficit, but avoid cutting carbs too aggressively.");
